@@ -21,16 +21,21 @@ pipeline {
                 sh 'mvn clean package'
             }
         }
+
         stage('SonarQube Analysis') {
     environment {
         SONAR_AUTH_TOKEN = credentials('sonarqube')
+        SONAR_HOST_URL = 'http://52.90.186.100:9000/'  // Update URL
     }
     steps {
-        withSonarQubeEnv('SonarQube') {  // Or your server name
-            sh 'mvn clean package sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN'
-                                     }
+        sh '''
+            mvn clean package org.sonarsource.scanner.maven:sonar-maven-plugin:3.11.0.3921:sonar \
+            -Dsonar.login=$SONAR_AUTH_TOKEN \
+            -Dsonar.host.url=$SONAR_HOST_URL
+        '''
             }
-    }
+        }
+
 
         // Uploading code Artifact to the JFrog Artifactory
         stage('Upload Code Artifacts') {
