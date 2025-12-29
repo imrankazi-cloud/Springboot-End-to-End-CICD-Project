@@ -21,17 +21,17 @@ pipeline {
                 sh 'mvn clean package'
             }
         }
-        stage('Static Code Analysis') {
-            // Code Analysis will happend, the Sonar server configured and URL written in the environment below
-            environment {
-                SONAR_URL = "http://52.90.186.100:9000/"
+        stage('SonarQube Analysis') {
+    environment {
+        SONAR_AUTH_TOKEN = credentials('sonarqube')
+    }
+    steps {
+        withSonarQubeEnv('SonarQube') {  // Or your server name
+            sh 'mvn clean package sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN'
+                                     }
             }
-            // Starting the Static Code Analysis 
-            steps {
-                environment { SONAR_AUTH_TOKEN = credentials('SonarQube') }
-                sh 'mvn sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN'
-            }
-        }
+    }
+
         // Uploading code Artifact to the JFrog Artifactory
         stage('Upload Code Artifacts') {
             agent {
