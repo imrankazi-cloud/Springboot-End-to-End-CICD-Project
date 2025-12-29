@@ -82,7 +82,7 @@ pipeline {
         stage('Updating Deployment File') {
             // GIT Repo and username
             environment {
-                GIT_REPO_NAME = "Springboot-end-to-end"
+                GIT_REPO_NAME = "Springboot-End-to-End-CICD-Project"
                 GIT_USER_NAME = "imrankazi-cloud"
             }
             steps {
