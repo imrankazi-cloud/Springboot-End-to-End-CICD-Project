@@ -30,7 +30,6 @@ pipeline {
             steps {
                 environment { SONAR_AUTH_TOKEN = credentials('sonarqube') }
                 sh 'mvn sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN'
-                }
             }
         }
         // Uploading code Artifact to the JFrog Artifactory
