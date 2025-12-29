@@ -28,7 +28,7 @@ pipeline {
             }
             // Starting the Static Code Analysis 
             steps {
-                environment { SONAR_AUTH_TOKEN = credentials('sonarqube') }
+                environment { SONAR_AUTH_TOKEN = credentials('SonarQube') }
                 sh 'mvn sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN'
             }
         }
