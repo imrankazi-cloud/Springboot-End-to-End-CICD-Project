@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: spring-boot-app
-        image: avian19/spring-docker:replaceImageTag
+        image: imranawsdevops/spring-docker:replaceImageTag
         ports:
         - containerPort: 8080
