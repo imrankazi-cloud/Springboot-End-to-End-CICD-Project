@@ -26,7 +26,7 @@ pipeline {
     }
     steps {
         sh '''
-            mvn clean package org.sonarsource.scanner.maven:sonar-maven-plugin:4.0.0.4121:sonar \\
+           mvn clean package org.sonarsource.scanner.maven:sonar-maven-plugin:3.11.0.3921:sonar \\
                 -Dsonar.login=$SONAR_AUTH_TOKEN \\
                 -Dsonar.host.url=$SONAR_URL
         '''
