@@ -6,6 +6,10 @@ pipeline {
             description: 'Upload Artifact?',
             name: 'YES'
         )
+        options {
+        skipDefaultCheckout()
+        timeout(time: 30, unit: 'MINUTES')
+    }
     }
     agent {
         // Docker Image where Maven and Docker Installed already, So don't need to configure separately
@@ -15,6 +19,22 @@ pipeline {
         }
     }
     stages {
+         stage('Clean Workspace') {
+            steps {
+                script {
+                    // Force delete everything
+                    sh '''
+                        rm -rf target .git/logs .git/refs/remotes/origin
+                        git clean -fdx
+                    '''
+                }
+            }
+        }
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
         // Building the Maven Project
         stage('Build & Test') {
             steps {
