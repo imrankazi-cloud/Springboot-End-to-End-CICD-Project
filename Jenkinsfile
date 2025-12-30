@@ -25,10 +25,16 @@ pipeline {
         SONAR_URL = 'http://98.80.65.36:9000'  // Replace with actual URL
     }
     steps {
-        sh '''
-          mvn clean package org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.1.2184:sonar \\
+      sh '''
+            mvn clean package
+            wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+            unzip -o sonar-scanner-cli-5.0.1.3006-linux.zip
+            ./sonar-scanner-5.0.1.3006-linux/bin/sonar-scanner \\
+                -Dsonar.projectKey=aioofbot \\
+                -Dsonar.sources=. \\
+                -Dsonar.host.url=$SONAR_URL \\
                 -Dsonar.login=$SONAR_AUTH_TOKEN \\
-                -Dsonar.host.url=$SONAR_URL
+                -Dsonar.java.binaries=target/classes
         '''
     }
 }
