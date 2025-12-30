@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk-alpine
+FROM openjdk:8-jdk
 
 ARG artifact=target/aioofbot-0.0.1-SNAPSHOT.jar
 
