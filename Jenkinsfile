@@ -19,17 +19,19 @@ pipeline {
       }
     }
 
-     stage('Static Code Analysis') {
-      environment {
-        SONAR_URL = "http://98.80.65.36:9000/"
-      }
-      steps {
-        withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-          sh 'mvn sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}'
-        }
-      }
+     stage('SonarQube Analysis') {
+    environment {
+        SONAR_AUTH_TOKEN = credentials('sonarqube')
+        SONAR_URL = 'http://98.80.65.36:9000'  // Replace with actual URL
     }
-
+    steps {
+        sh '''
+            mvn clean package org.sonarsource.scanner.maven:sonar-maven-plugin:4.0.0.4121:sonar \\
+                -Dsonar.login=$SONAR_AUTH_TOKEN \\
+                -Dsonar.host.url=$SONAR_URL
+        '''
+    }
+}
 
         // Uploading code Artifact to the JFrog Artifactory
         stage('Upload Code Artifacts') {
