@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk
+FROM eclipse-temurin:8-jdk-alpine
 
 ARG artifact=target/aioofbot-0.0.1-SNAPSHOT.jar
 
