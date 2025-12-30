@@ -1,60 +1,34 @@
 pipeline {
-    parameters {
-        // Checkbox Parameter, If checked Artifact will upload otherwise skip the stage
-        booleanParam(
-            defaultValue: false,
-            description: 'Upload Artifact?',
-            name: 'YES'
-        )
-        options {
-        skipDefaultCheckout()
-        timeout(time: 30, unit: 'MINUTES')
+  agent {
+    docker {
+      image 'abhishekf5/maven-abhishek-docker-agent:v1'
+      args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
     }
+  }
+  stages {
+    stage('Checkout') {
+      steps {
+        sh 'echo passed'
+          }
     }
-    agent {
-        // Docker Image where Maven and Docker Installed already, So don't need to configure separately
-        docker {
-            image 'abhishekf5/maven-abhishek-docker-agent:v1'
-            args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
-        }
+    stage('Build and Test') {
+      steps {
+        sh 'ls -ltr'
+        // build the project and create a JAR file
+        sh 'mvn clean package'
+      }
     }
-    stages {
-         stage('Clean Workspace') {
-            steps {
-                script {
-                    // Force delete everything
-                    sh '''
-                        rm -rf target .git/logs .git/refs/remotes/origin
-                        git clean -fdx
-                    '''
-                }
-            }
-        }
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-        // Building the Maven Project
-        stage('Build & Test') {
-            steps {
-                sh 'mvn clean package'
-            }
-        }
 
-        stage('SonarQube Analysis') {
-    environment {
-        SONAR_AUTH_TOKEN = credentials('sonarqube')
-        SONAR_HOST_URL = 'http://52.90.186.100:9000/'  // Update URL
-    }
-    steps {
-        sh '''
-            mvn clean package org.sonarsource.scanner.maven:sonar-maven-plugin:3.11.0.3921:sonar \
-            -Dsonar.login=$SONAR_AUTH_TOKEN \
-            -Dsonar.host.url=$SONAR_HOST_URL
-        '''
-            }
+     stage('Static Code Analysis') {
+      environment {
+        SONAR_URL = "http://98.80.65.36:9000/"
+      }
+      steps {
+        withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+          sh 'mvn sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}'
         }
+      }
+    }
 
 
         // Uploading code Artifact to the JFrog Artifactory
@@ -75,7 +49,7 @@ pipeline {
                 script {
                     // If Checkbox tick then, Perform this stage
                     if (params.YES) {
-                        sh 'jfrog rt upload --url http://54.234.32.232:8082/artifactory/ --access-token ${ARTIFACTORY_ACCESS_TOKEN} target/*.jar springboot-web-app/'
+                        sh 'jfrog rt upload --url http://3.90.216.177:8082/artifactory/ --access-token ${ARTIFACTORY_ACCESS_TOKEN} target/*.jar springboot-web-app/'
                     } else {
                         // If Checkbox not tick then, Skip this stage and go for the next stage
                         return
